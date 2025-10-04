@@ -1,0 +1,10 @@
+{
+    "name": "voice-chatbot-root",
+    "private": true,
+    "scripts": {
+        "dev": "npm --prefix frontend run dev -- -p 3000",
+        "dev:frontend": "npm --prefix frontend run dev -- -p 3000",
+        "dev:backend": "bash -lc 'cd backend && ./run.sh'",
+        "dev:force": "bash -lc 'lsof -ti tcp:3000 | xargs -r kill -9; npm --prefix frontend run dev -- -p 3000'"
+    }
+}
