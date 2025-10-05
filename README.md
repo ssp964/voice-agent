@@ -4,26 +4,14 @@ Voice AI agent with STT/TTS capabilities using Next.js + FastAPI.
 
 ## Quick Start
 
-### Backend
+### One-command (Docker Compose)
 ```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-./run.sh
+docker compose up --build
 ```
-
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### n8n (Optional)
-```bash
-docker run -it --rm --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n
-```
+Services:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- n8n: http://localhost:5678
 
 ## Usage
 

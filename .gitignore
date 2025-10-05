@@ -23,4 +23,8 @@ backend/.mypy_cache/
 .idea/
 .vscode/
 
+# Local data/state persisted by docker compose
+n8n_data/
+ollama_data/
+
 

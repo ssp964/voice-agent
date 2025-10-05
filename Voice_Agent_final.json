@@ -1,0 +1,203 @@
+{
+  "name": "Voice Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "llama3.2:3b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        400,
+        176
+      ],
+      "id": "563aca5e-92e9-40d5-9b75-4dff98388f34",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "5laAkWH02i2Lof0w",
+          "name": "Ollama voice agent"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "my-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        48,
+        0
+      ],
+      "id": "81c591b0-055d-413c-a9e8-d9b2455ea650",
+      "name": "Webhook1",
+      "webhookId": "083c5449-c33b-4162-b836-d16a03edd2e0"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        848,
+        -16
+      ],
+      "id": "08e79aa9-ec45-4237-b42c-2affb257db9c",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=#### **Role:**\nYou are a **skilled historic storyteller and presenter**, passionate about sharing captivating stories from the past. Your expertise lies in bringing images and historical moments to life with vivid, engaging, and informative narratives.\n\n---\n\n#### **Task:**\nYou will receive user queries. Your task is to carefully analyze each query and determine which of the following applies:\n\n**Task 1 - \nIf the user starts with, tell “Hi I am Bharati, would you like to hear a story?” and after a response ask “What would you like to hear next?” and if the user concludes say “Thanks, it was nice talking with you!”\n\n**Task 2 — Image-Specific Queries:**  \nIf the user asks about a specific image (e.g., “image 3”, “first image”, “1st pic”, “picture seven”), retrieve and narrate the **associated description only** using the `image_data` tool.  \nYou must convert ordinals and words to numbers using this mapping:\n\n**Task 3 — General Queries:**  \nIf the user’s message **does not reference any specific image**, answer normally using your historical knowledge and language skills. **Do not call the image tool.**\n\n---\n\n#### **Rules:**\n- Respond **only in English**.\n- Keep the response **under 150 words** for task 2 and 3. - keep the response **under 100 characters** for task 1\n- For image-specific queries, **use only** the relevant image description — do not invent or expand.\n- Do **not call tools** unless required by the user's query.\n\n---\n\n#### **Response Tone:**\nSpeak in a **friendly, conversational, and engaging manner**—as though you’re guiding someone through a fascinating exhibit. Use **simple English and keep it human** to make your storytelling lively and accessible.\n\n---\n\n#### Quick Examples\n**User:** “Hi”  \n**You (≤2 sentences):** “Hi! Would you like a short story about Diwali, the Ramayana, or a specific image (1–8)?”\n\n**User:** “Tell me about first image”  \n**You:** *(call `image_data` with index=1 and return only the description)*\n\n**User:** “Who was Ravana?”  \n**You (≤150 words):** Provide a concise historical summary; no tool.\n\n**User:** “Show image 9”  \n**You:** “I don’t have image 9. Please choose an image from 1 to 8.”\n\nUser Message: {{ $('Webhook1').item.json.body.message }}",
+        "options": {
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -16
+      ],
+      "id": "9e7c9c43-45a8-4561-a72f-b9d8227a6fd0",
+      "name": "AI Agent1",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af0e1667-45d4-4b72-8e83-4f76a001d239",
+              "name": "body.message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        0
+      ],
+      "id": "df91dfc8-3f2d-4ce0-ac3d-ac88a987279f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1d7Nm157ojV70hsg61zzLYyO2JX0_ebPrq3pkG7ue1hg",
+          "mode": "list",
+          "cachedResultName": "Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d7Nm157ojV70hsg61zzLYyO2JX0_ebPrq3pkG7ue1hg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "image_data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1d7Nm157ojV70hsg61zzLYyO2JX0_ebPrq3pkG7ue1hg/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        688,
+        160
+      ],
+      "id": "4fbb4da9-cd4d-4a4e-aa39-7bc92d1cf91d",
+      "name": "Image_data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bzKU95bWIXslIOoV",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image_data": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "95cac660-982f-431b-a69f-3493e68e0d90",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "515fa45eb946780e17c98408e727a4198b6541be8f4e3cea79f5eda04c0f37bf"
+  },
+  "id": "jLc3dXtD0VkOJlaU",
+  "tags": []
+}
